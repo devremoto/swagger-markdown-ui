@@ -15,10 +15,10 @@
 
     <div class="mb-3">
       <label for="baseUrlInput" class="form-label">Swagger</label>
-      <textarea class="form-control form-input" rows="5" v-model="content"></textarea>
+      <textarea class="form-control form-input" rows="5" v-model="content" @change="reset" ></textarea>
     </div>
 
-    <button @click="generatePreview" :disabled="!swaggerUrl" class="btn btn-primary">Generate Preview</button>
+    <button @click="generatePreview()" :disabled="!(swaggerUrl || content)" class="btn btn-primary">Generate Preview</button>
 
     <hr class="my-4">
 
@@ -44,21 +44,25 @@
 <script>
 import axios from 'axios';
 import { marked } from 'marked';
+import { ref } from 'vue';
 export default {
   data() {
     return {
       swaggerUrl: '',
       baseUrl: '',
-      content:'',
+      content: '',
       readme: '',
       source: '',
       json: {}
     };
   },
+  computed: {
+
+  },
   methods: {
     showDown() {
       this.reset();
-      if (!this.swaggerUrl) {
+      if (!(this.swaggerUrl || this.content)) {
         return;
       }
       return this.anchor(marked(this.readme));
@@ -74,7 +78,7 @@ export default {
       return replacedHtml;
     },
     reset() {
-      if (!this.swaggerUrl) {
+      if (!(this.swaggerUrl || this.content)) {
         this.readme = ''
         this.source = ''
         this.json = {}
@@ -83,20 +87,17 @@ export default {
     async generatePreview() {
       try {
         this.reset();
-        if (!this.swaggerUrl) {
+        if (!(this.swaggerUrl || this.content)) {
           return;
         }
-        let url = `http://localhost:3000/preview?preview[url]=${encodeURIComponent(this.swaggerUrl)}`
-        if (this.baseUrl)
-          url += `&preview[baseUrl]=${encodeURIComponent(this.baseUrl)}`;
-        if (this.content)
-          url += `&preview[content]=${encodeURIComponent(this.content)}`;
-        const response = await axios.get(url)
-
+        let url = `http://localhost:3000/preview`
+        const response = await axios.post(url, this)
+        let { readme, source, sourceJson: json } = response.data
         console.log(response);
-        this.readme = response.data.readme;
-        this.source = response.data.source;
-        this.json = response.data.sourceJson;
+        this.readme = readme;
+        this.source = source;
+        this.json = json;
+        console.log({ readme, source, json })
       } catch (error) {
         console.error('Error fetching preview:', error);
       }
