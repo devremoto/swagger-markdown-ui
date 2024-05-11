@@ -72,7 +72,7 @@ export default {
 
       var replacedHtml = htmlString.replace(headerRegex, function (match, tagNumber, innerHtml) {
         var id = innerHtml.toLowerCase().replace(/\s/g, '-');
-        return `<h${tagNumber} id="${id}"><a class="link-none" href="#top" title="back to top">${innerHtml}</a></h${tagNumber}>`;
+        return `<h${tagNumber} id="${id}"><a class="link-none" href="#api-documentation" title="back to top">${innerHtml}</a></h${tagNumber}>`;
       });
 
       return replacedHtml;
