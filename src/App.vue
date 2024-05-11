@@ -4,7 +4,7 @@
 
     <div class="mb-3">
       <label for="urlInput" class="form-label">Swagger JSON URL</label>
-      <input v-model="swaggerUrl" @change="reset" type="text" class="form-control" id="urlInput"
+      <input v-model="url" @change="reset" type="text" class="form-control" id="urlInput"
         placeholder="Enter Swagger JSON URL">
     </div>
 
@@ -18,7 +18,7 @@
       <textarea class="form-control form-input" rows="5" v-model="content" @change="reset" ></textarea>
     </div>
 
-    <button @click="generatePreview()" :disabled="!(swaggerUrl || content)" class="btn btn-primary">Generate Preview</button>
+    <button @click="generatePreview()" :disabled="!(url || content)" class="btn btn-primary">Generate Preview</button>
 
     <hr class="my-4">
 
@@ -48,7 +48,7 @@ import { ref } from 'vue';
 export default {
   data() {
     return {
-      swaggerUrl: '',
+      url: '',
       baseUrl: '',
       content: '',
       readme: '',
@@ -62,7 +62,7 @@ export default {
   methods: {
     showDown() {
       this.reset();
-      if (!(this.swaggerUrl || this.content)) {
+      if (!(this.url || this.content)) {
         return;
       }
       return this.anchor(marked(this.readme));
@@ -78,7 +78,7 @@ export default {
       return replacedHtml;
     },
     reset() {
-      if (!(this.swaggerUrl || this.content)) {
+      if (!(this.url || this.content)) {
         this.readme = ''
         this.source = ''
         this.json = {}
@@ -87,7 +87,7 @@ export default {
     async generatePreview() {
       try {
         this.reset();
-        if (!(this.swaggerUrl || this.content)) {
+        if (!(this.url || this.content)) {
           return;
         }
         let url = `http://localhost:3000/preview`
