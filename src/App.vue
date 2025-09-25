@@ -19,6 +19,7 @@
     </div>
 
     <button @click="generatePreview()" :disabled="!(url || content)" class="btn btn-primary">Generate Preview</button>
+    <button @click="clear()" :disabled="!readme" class="btn btn-warning m-2">Reset</button>
 
     <hr class="my-4">
 
@@ -76,6 +77,11 @@ export default {
       });
 
       return replacedHtml;
+    },
+    clear() {
+      this.readme = ''
+      this.source = ''
+      this.json = {}
     },
     reset() {
       if (!(this.url || this.content)) {
