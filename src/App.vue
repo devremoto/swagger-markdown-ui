@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2">
+  <div class="row mt-2">
     <h1 class="mb-4" id="top">Swagger Markdown Preview</h1>
 
     <div class="mb-3">
@@ -17,32 +17,28 @@
       <label for="baseUrlInput" class="form-label">Swagger</label>
       <textarea class="form-control form-input" rows="5" v-model="content" @change="reset" ></textarea>
     </div>
-
+    <div class="mb-3">
     <button @click="generatePreview()" :disabled="!(url || content)" class="btn btn-primary">Generate Preview</button>
-    <button @click="clear()" :disabled="!readme" class="btn btn-warning m-2">Reset</button>
+    <button @click="clear()" :disabled="!readme" class="btn btn-warning m-2">Reset</button></div>
+</div>
 
-    <hr class="my-4">
+    <div v-if="readme" class="row mt-2"> 
+      <div class="col-8">
+        <label class="form-label">Preview</label> 
+      </div>
+      <div class="col-4 text-end">
+          <span id="copyBtn" class="me-3" role="button" title="Copy to clipboard"
 
-    <div v-if="readme" class="row">
-      <div class="col-4">
-        <label class="form-label">Readme</label>
-        <textarea class="form-control form-input" rows="5" v-html="readme"></textarea>
+            @click="copyToClipboard(readme)">
+            <i class="bi bi-clipboard"></i>
+          </span>
+          <span id="downloadBtn" @click="download(readme)" role="button" title="Download Markdown file">           
+            <i class="bi bi-download"></i></span>
+        </div>
+      <div class="col-12 preview-container mt-2 mb-5">
+         <div v-html="showDown()" class="card md-container inner-shadow"></div>
       </div>
-      <div class="col-4 px-2">
-        <label class="form-label">Source</label>
-        <textarea class="form-control" rows="5" v-html="source"></textarea>
-      </div>
-      <div class="col-4">
-        <label class="form-label">Json</label>
-        <textarea class="form-control" rows="5" v-html="json"></textarea>
-      </div>
-      <label class="form-label mt-5">Preview</label> 
-      <button id="downloadBtn" class="btn btn-secondary btn-sm mb-2" style="float: right;">
-        <a :href="'data:text/markdown;charset=utf-8,' + encodeURIComponent(readme)" :download="fileName"
-          style="color: white; text-decoration: none;">Download MD {{ fileName }}</a>
-      </button>
-      <div v-html="showDown()" class="col-12 card md-container inner-shadow"></div>
-    </div>
+
   </div>
 </template>
 
@@ -119,9 +115,29 @@ export default {
       } catch (error) {
         console.error('Error fetching preview:', error);
       }
+    },
+    download(text) {
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.fileName || 'API-DOCUMENTATION.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+    async copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      }, (err) => {
+        console.error('Could not copy text: ', err);
+      });
     }
   }
+
 }
+
 </script>
 
 <style>
