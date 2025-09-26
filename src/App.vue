@@ -36,7 +36,11 @@
         <label class="form-label">Json</label>
         <textarea class="form-control" rows="5" v-html="json"></textarea>
       </div>
-      <label class="form-label mt-5">Preview</label>
+      <label class="form-label mt-5">Preview</label> 
+      <button id="downloadBtn" class="btn btn-secondary btn-sm mb-2" style="float: right;">
+        <a :href="'data:text/markdown;charset=utf-8,' + encodeURIComponent(readme)" :download="fileName"
+          style="color: white; text-decoration: none;">Download MD {{ fileName }}</a>
+      </button>
       <div v-html="showDown()" class="col-12 card md-container inner-shadow"></div>
     </div>
   </div>
@@ -54,7 +58,8 @@ export default {
       content: '',
       readme: '',
       source: '',
-      json: {}
+      json: {},
+      fileName: ''
     };
   },
   computed: {
@@ -96,13 +101,20 @@ export default {
         if (!(this.url || this.content)) {
           return;
         }
-        let url = `http://localhost:3000/preview`
-        const response = await axios.post(url, this)
+        let apiUrl = `http://localhost:3000/preview`
+        var params = {
+          url: this.url,
+          baseUrl: this.baseUrl,
+          content: this.content
+        }
+        const response = await axios.post(apiUrl, params)
         let { readme, source, sourceJson: json } = response.data
         console.log(response);
         this.readme = readme;
         this.source = source;
         this.json = json;
+        var dateTimeGenerated = new Date().toISOString().replace(/[:.]/g, '-');
+        this.fileName = `API-DOCUMENTATION-${dateTimeGenerated}.md`;
         console.log({ readme, source, json })
       } catch (error) {
         console.error('Error fetching preview:', error);
